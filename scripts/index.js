@@ -11,13 +11,12 @@ let gameArea = {
         let gameContainer = document.getElementById('gameContainer');
         gameContainer.appendChild(this.canvas);
         this.interval = setInterval(updateGameArea, 20);
-        gameContainer.addEventListener('mousedown', (e) => {
-            gameArea.x = e.pageX;
-            gameArea.y = e.pageY;
-            console.log(gameArea.x);
-            console.log(gameArea.y);
+        this.canvas.addEventListener('mousedown', (e) => {
+            let mousePos = getMousePos(this.canvas, e);
+            gameArea.x = mousePos.x;
+            gameArea.y = mousePos.y;
         });
-        gameContainer.addEventListener('mouseup', (e) => {
+        this.canvas.addEventListener('mouseup', (e) => {
             gameArea.x = false;
             gameArea.y = false;
         });
@@ -47,8 +46,8 @@ function component (width, height, color, x, y) {
         let currentRight = this.x + this.width;
         let currentTop = this.y;
         let currentBottom = this.y + this.height;
-        let clicked = false;
-        if ((currentBottom >= gameArea.y) || (currentTop <= gameArea.y) || (currentLeft >= gameArea.x) || (currentRight <= gameArea.x)) {
+        let clicked = true;
+        if (currentBottom < gameArea.y || currentTop > gameArea.y || currentLeft > gameArea.x || currentRight < gameArea.x) {
             clicked = false;
         }
         return clicked;
@@ -63,4 +62,12 @@ function updateGameArea() {
         }
     }
     trailer.update();
+}
+
+function getMousePos(canvas, e) {
+    let rect = canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
 }
