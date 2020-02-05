@@ -2,6 +2,8 @@ let keys = {
     mouseDown: false
 };
 
+let offset = {};
+
 let gameArea = {
     canvas: (() => {
         let canvas = document.createElement('canvas');
@@ -21,13 +23,26 @@ let gameArea = {
             gameArea.x = mousePos.x;
             gameArea.y = mousePos.y;
             trailer.clicked();
+            if (trailer.isClicked) {
+                offset.startX = mousePos.x;
+                offset.startY = mousePos.y;
+            }
         });
         this.canvas.addEventListener('mousemove', (e) => {
             let mousePos = getMousePos(this.canvas, e);
             if (gameArea.x && gameArea.y) {
                 if (keys.mouseDown && trailer.isClicked) {
+                    //offset.startX = mousePos.x - offset.startX;
+                    //console.log(mousePos.x + ', ' + mousePos.y);
+                    //offset.vectorX = mousePos.x - offset.startX;
+                    //offset.vectorY = mousePos.y - offset.startY;
+                    //console.log(offset.vectorX + ', ' + offset.vectorY);
+                    //console.log(offset.startX + ', ' + offset.startY);
+                    //trailer.x = offset.startX;
+                    //trailer.y = offset.startY;
                     trailer.x = mousePos.x;
                     trailer.y = mousePos.y;
+                    //console.log(trailer.x + ', ' + trailer.y);
                 }
             }
         });
@@ -44,19 +59,24 @@ let gameArea = {
 
 function startGame() {
     gameArea.start();
-    trailer = new component(40, 20, 'blue', 20, 20);
+    trailer = new component(90, 30, 'blue', 20, 20, 'ABC000');
 };
 
-function component (width, height, color, x, y) {
+function component (width, height, color, x, y, plateNr) {
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
+    this.plateNr = plateNr;
     this.isClicked = false;
     this.update = () => {
         context = gameArea.context;
         context.fillStyle = color;
         context.fillRect(this.x, this.y, this.width, this.height);
+        context.font = '20px Arial';
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.3);
     };
     this.clicked = () => {
         let currentLeft = this.x;
