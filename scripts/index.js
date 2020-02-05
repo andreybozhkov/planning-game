@@ -1,3 +1,7 @@
+let keys = {
+    mouseDown: false
+};
+
 let gameArea = {
     canvas: (() => {
         let canvas = document.createElement('canvas');
@@ -12,11 +16,23 @@ let gameArea = {
         gameContainer.appendChild(this.canvas);
         this.interval = setInterval(updateGameArea, 20);
         this.canvas.addEventListener('mousedown', (e) => {
+            keys.mouseDown = true;
             let mousePos = getMousePos(this.canvas, e);
             gameArea.x = mousePos.x;
             gameArea.y = mousePos.y;
+            trailer.clicked();
+        });
+        this.canvas.addEventListener('mousemove', (e) => {
+            let mousePos = getMousePos(this.canvas, e);
+            if (gameArea.x && gameArea.y) {
+                if (keys.mouseDown && trailer.isClicked) {
+                    trailer.x = mousePos.x;
+                    trailer.y = mousePos.y;
+                }
+            }
         });
         this.canvas.addEventListener('mouseup', (e) => {
+            keys.mouseDown = false;
             gameArea.x = false;
             gameArea.y = false;
         });
@@ -36,6 +52,7 @@ function component (width, height, color, x, y) {
     this.height = height;
     this.x = x;
     this.y = y;
+    this.isClicked = false;
     this.update = () => {
         context = gameArea.context;
         context.fillStyle = color;
@@ -46,21 +63,14 @@ function component (width, height, color, x, y) {
         let currentRight = this.x + this.width;
         let currentTop = this.y;
         let currentBottom = this.y + this.height;
-        let clicked = true;
-        if (currentBottom < gameArea.y || currentTop > gameArea.y || currentLeft > gameArea.x || currentRight < gameArea.x) {
-            clicked = false;
-        }
-        return clicked;
+        if (currentBottom >= gameArea.y && currentTop <= gameArea.y && currentLeft <= gameArea.x && currentRight >= gameArea.x) {
+            this.isClicked = true;
+        } else this.isClicked = false;
     }
 };
 
 function updateGameArea() {
     gameArea.clear();
-    if (gameArea.x && gameArea.y) {
-        if (trailer.clicked()) {
-            trailer.x += 10;
-        }
-    }
     trailer.update();
 }
 
