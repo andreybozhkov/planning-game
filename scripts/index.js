@@ -24,25 +24,20 @@ let gameArea = {
             gameArea.y = mousePos.y;
             trailer.clicked();
             if (trailer.isClicked) {
-                offset.startX = mousePos.x;
-                offset.startY = mousePos.y;
+                offset.lastX = mousePos.x;
+                offset.lastY = mousePos.y;
             }
         });
         this.canvas.addEventListener('mousemove', (e) => {
             let mousePos = getMousePos(this.canvas, e);
             if (gameArea.x && gameArea.y) {
                 if (keys.mouseDown && trailer.isClicked) {
-                    //offset.startX = mousePos.x - offset.startX;
-                    //console.log(mousePos.x + ', ' + mousePos.y);
-                    //offset.vectorX = mousePos.x - offset.startX;
-                    //offset.vectorY = mousePos.y - offset.startY;
-                    //console.log(offset.vectorX + ', ' + offset.vectorY);
-                    //console.log(offset.startX + ', ' + offset.startY);
-                    //trailer.x = offset.startX;
-                    //trailer.y = offset.startY;
-                    trailer.x = mousePos.x;
-                    trailer.y = mousePos.y;
-                    //console.log(trailer.x + ', ' + trailer.y);
+                    offset.deltaX = mousePos.x - offset.lastX;
+                    offset.lastX = mousePos.x;
+                    offset.deltaY = mousePos.y - offset.lastY;
+                    offset.lastY = mousePos.y;
+                    trailer.x += offset.deltaX;
+                    trailer.y += offset.deltaY;
                 }
             }
         });
