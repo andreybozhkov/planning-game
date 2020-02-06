@@ -1,8 +1,9 @@
 let keys = {
     mouseDown: false
 };
-
 let offset = {};
+let time = 30 * 1000;
+let timeSeconds = time / 1000;
 
 let gameArea = {
     canvas: (() => {
@@ -78,13 +79,13 @@ let gameArea = {
 
 function startGame() {
     gameArea.start();
+    timer = new component(60, 20, 'black', '', 'timer');
     trailers = [];
     generateTrailers(20);
     positionVehicles(trailers);
     trucks = [];
     generateTrucks(20);
     positionVehicles(trucks);
-    time = 30 * 1000;
 };
 
 function component(width, height, color, plateNr, type) {
@@ -97,18 +98,30 @@ function component(width, height, color, plateNr, type) {
     this.isClicked = false;
     this.update = () => {
         context = gameArea.context;
-        context.fillStyle = color;
-        context.fillRect(this.x, this.y, this.width, this.height);
-        if (this.type === 'trailer') {
+        if (this.type === 'timer') {
+            if (time % 1000 === 0) {
+                timeSeconds -= 1;
+            }
+            this.x = gameArea.canvas.width / 2;
+            this.y = 25;
             context.font = '20px Arial';
-            context.fillStyle = 'white';
-            context.textAlign = 'center';
-            context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.3);
-        } else if (this.type === 'truck') {
-            context.font = '15px Arial';
             context.fillStyle = 'black';
             context.textAlign = 'center';
-            context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.4, this.width);
+            context.fillText(`Time remaining to match a trailer to each truck: ${timeSeconds} seconds.`, this.x, this.y);
+        } else {
+            context.fillStyle = color;
+            context.fillRect(this.x, this.y, this.width, this.height);
+            if (this.type === 'trailer') {
+                context.font = '20px Arial';
+                context.fillStyle = 'white';
+                context.textAlign = 'center';
+                context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.3);
+            } else if (this.type === 'truck') {
+                context.font = '15px Arial';
+                context.fillStyle = 'black';
+                context.textAlign = 'center';
+                context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.4, this.width);
+            }
         }
     };
     this.clicked = () => {
@@ -128,6 +141,7 @@ function updateGameArea() {
         gameArea.stop();
     }
     gameArea.clear();
+    timer.update();
     trailers.forEach(trailer => {
         trailer.update();
     });
@@ -164,7 +178,7 @@ function generateTrailers(nrOfTrucks) {
 function positionVehicles(vehiclesArray) { // TO DO: fix the max limit of vehicles possible to be drawn on the canvas or implement "waiting list" for drawing
     let marginLeft = 10;
     let marginRight = gameArea.canvas.width - 10;
-    let marginTop = 10;
+    let marginTop = 40;
     let marginBottom = gameArea.canvas.height / 2;
     if (vehiclesArray[0].type === 'truck') {
         marginTop = gameArea.canvas.height / 2 + 10;
