@@ -29,6 +29,13 @@ let gameArea = {
                     offset.lastY = mousePos.y;
                 }
             });
+            trucks.forEach(truck => {
+                truck.clicked();
+                if (truck.isClicked) {
+                    offset.lastX = mousePos.x;
+                    offset.lastY = mousePos.y;
+                }
+            });
         });
         this.canvas.addEventListener('mousemove', (e) => {
             let mousePos = getMousePos(this.canvas, e);
@@ -41,6 +48,16 @@ let gameArea = {
                         offset.lastY = mousePos.y;
                         trailer.x += offset.deltaX;
                         trailer.y += offset.deltaY;
+                    }
+                });
+                trucks.forEach(truck => {
+                    if (truck.isClicked) {
+                        offset.deltaX = mousePos.x - offset.lastX;
+                        offset.lastX = mousePos.x;
+                        offset.deltaY = mousePos.y - offset.lastY;
+                        offset.lastY = mousePos.y;
+                        truck.x += offset.deltaX;
+                        truck.y += offset.deltaY;
                     }
                 });
             }
@@ -61,9 +78,12 @@ function startGame() {
     trailers = [];
     generateTrailers(20);
     positionTrailers(trailers);
+    trucks = [];
+    generateTrucks(20);
 };
 
-function component(width, height, color, plateNr) {
+function component(width, height, color, plateNr, type) {
+    this.type = type;
     this.width = width;
     this.height = height;
     this.x = 0;
@@ -74,10 +94,17 @@ function component(width, height, color, plateNr) {
         context = gameArea.context;
         context.fillStyle = color;
         context.fillRect(this.x, this.y, this.width, this.height);
-        context.font = '20px Arial';
-        context.fillStyle = 'white';
-        context.textAlign = 'center';
-        context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.3);
+        if (this.type === 'trailer') {
+            context.font = '20px Arial';
+            context.fillStyle = 'white';
+            context.textAlign = 'center';
+            context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.3);
+        } else if (this.type === 'truck') {
+            context.font = '15px Arial';
+            context.fillStyle = 'black';
+            context.textAlign = 'center';
+            context.fillText(this.plateNr, this.x + this.width / 2, this.y + this.height / 1.4, this.width);
+        }
     };
     this.clicked = () => {
         let currentLeft = this.x;
@@ -95,6 +122,9 @@ function updateGameArea() {
     trailers.forEach(trailer => {
         trailer.update();
     });
+    trucks.forEach(truck => {
+        truck.update();
+    });
 }
 
 function getMousePos(canvas, e) {
@@ -105,9 +135,9 @@ function getMousePos(canvas, e) {
     };
 }
 
-function generateTrailers(nrOfTrailers) {
+function generateTrailers(nrOfTrucks) {
     let startNr = 1;
-    for (i = startNr; i <= nrOfTrailers; i++) {
+    for (i = startNr; i <= nrOfTrucks; i++) {
         let nrSeries = '';
         if (i < 10) {
             nrSeries = `00${i}`;
@@ -118,7 +148,7 @@ function generateTrailers(nrOfTrailers) {
         else if (i >= 100) {
             nrSeries = `${i}`;
         }
-        trailers.push(new component(90, 30, 'blue', `ABC${nrSeries}`));
+        trailers.push(new component(90, 30, 'blue', `ABC${nrSeries}`, 'trailer'));
     }
 }
 
@@ -144,4 +174,21 @@ function positionTrailers(trailersArray) {
             lastX += trailer.width + spacing;
         }
     })
+}
+
+function generateTrucks(nrOfTrucks) {
+    let startNr = 1;
+    for (i = startNr; i <= nrOfTrucks; i++) {
+        let nrSeries = '';
+        if (i < 10) {
+            nrSeries = `00${i}`;
+        }
+        else if (i >= 10 && i < 100) {
+            nrSeries = `0${i}`;
+        }
+        else if (i >= 100) {
+            nrSeries = `${i}`;
+        }
+        trucks.push(new component(30, 30, 'red', `X${nrSeries}`, 'truck'));
+    }
 }
