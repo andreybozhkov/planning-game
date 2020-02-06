@@ -22,23 +22,27 @@ let gameArea = {
             let mousePos = getMousePos(this.canvas, e);
             gameArea.x = mousePos.x;
             gameArea.y = mousePos.y;
-            trailer0.clicked();
-            if (trailer0.isClicked) {
-                offset.lastX = mousePos.x;
-                offset.lastY = mousePos.y;
-            }
+            trailers.forEach(trailer => {
+                trailer.clicked();
+                if (trailer.isClicked) {
+                    offset.lastX = mousePos.x;
+                    offset.lastY = mousePos.y;
+                }
+            });
         });
         this.canvas.addEventListener('mousemove', (e) => {
             let mousePos = getMousePos(this.canvas, e);
-            if (gameArea.x && gameArea.y) {
-                if (keys.mouseDown && trailer0.isClicked) {
-                    offset.deltaX = mousePos.x - offset.lastX;
-                    offset.lastX = mousePos.x;
-                    offset.deltaY = mousePos.y - offset.lastY;
-                    offset.lastY = mousePos.y;
-                    trailer0.x += offset.deltaX;
-                    trailer0.y += offset.deltaY;
-                }
+            if (gameArea.x && gameArea.y && keys.mouseDown) {
+                trailers.forEach(trailer => {
+                    if (trailer.isClicked) {
+                        offset.deltaX = mousePos.x - offset.lastX;
+                        offset.lastX = mousePos.x;
+                        offset.deltaY = mousePos.y - offset.lastY;
+                        offset.lastY = mousePos.y;
+                        trailer.x += offset.deltaX;
+                        trailer.y += offset.deltaY;
+                    }
+                });
             }
         });
         this.canvas.addEventListener('mouseup', (e) => {
@@ -55,7 +59,7 @@ let gameArea = {
 function startGame() {
     gameArea.start();
     trailers = [];
-    trailer0 = new component(90, 30, 'blue', 'ABC000');
+    //trailer0 = new component(90, 30, 'blue', 'ABC000');
     generateTrailers(10);
 };
 
@@ -88,7 +92,9 @@ function component(width, height, color, plateNr) {
 
 function updateGameArea() {
     gameArea.clear();
-    trailer0.update();
+    trailers.forEach(trailer => {
+        trailer.update();
+    });
 }
 
 function getMousePos(canvas, e) {
