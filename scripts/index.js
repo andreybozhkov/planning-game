@@ -77,9 +77,10 @@ function startGame() {
     gameArea.start();
     trailers = [];
     generateTrailers(20);
-    positionTrailers(trailers);
+    positionVehicles(trailers);
     trucks = [];
     generateTrucks(20);
+    positionVehicles(trucks);
 };
 
 function component(width, height, color, plateNr, type) {
@@ -152,26 +153,35 @@ function generateTrailers(nrOfTrucks) {
     }
 }
 
-function positionTrailers(trailersArray) {
-    let marginTop = 10;
+function positionVehicles(vehiclesArray) { // TO DO: fix the max limit of vehicles possible to be drawn on the canvas or implement "waiting list" for drawing
     let marginLeft = 10;
     let marginRight = gameArea.canvas.width - 10;
+    let marginTop = 10;
     let marginBottom = gameArea.canvas.height / 2;
+    if (vehiclesArray[0].type === 'truck') {
+        marginTop = gameArea.canvas.height / 2 + 10;
+        marginBottom = gameArea.canvas.height;
+    }
     let lastX = marginLeft;
     let lastY = marginTop;
     let spacing = 10;
+    let limitReached = false;
 
-    trailersArray.forEach(trailer => {
-        trailer.x = lastX;
-        trailer.y = lastY;
-        trailer.update();
+    vehiclesArray.forEach(vehicle => {
+        if (!limitReached) {
+            vehicle.x = lastX;
+            vehicle.y = lastY;
+            vehicle.update();
+        }
 
-        if (lastX + trailer.width * 2 + spacing > marginRight) {
+        if (lastX + vehicle.width * 2 + spacing > marginRight) {
             lastX = marginLeft;
-            if (lastY + trailer.height * 2 + spacing > marginBottom) return;
-            else lastY += trailer.height + spacing;
+            if (lastY + vehicle.height * 2 + spacing > marginBottom) {
+                limitReached = true;
+            }
+            else lastY += vehicle.height + spacing;
         } else {
-            lastX += trailer.width + spacing;
+            lastX += vehicle.width + spacing;
         }
     })
 }
