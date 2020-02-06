@@ -22,8 +22,8 @@ let gameArea = {
             let mousePos = getMousePos(this.canvas, e);
             gameArea.x = mousePos.x;
             gameArea.y = mousePos.y;
-            trailer.clicked();
-            if (trailer.isClicked) {
+            trailer0.clicked();
+            if (trailer0.isClicked) {
                 offset.lastX = mousePos.x;
                 offset.lastY = mousePos.y;
             }
@@ -31,13 +31,13 @@ let gameArea = {
         this.canvas.addEventListener('mousemove', (e) => {
             let mousePos = getMousePos(this.canvas, e);
             if (gameArea.x && gameArea.y) {
-                if (keys.mouseDown && trailer.isClicked) {
+                if (keys.mouseDown && trailer0.isClicked) {
                     offset.deltaX = mousePos.x - offset.lastX;
                     offset.lastX = mousePos.x;
                     offset.deltaY = mousePos.y - offset.lastY;
                     offset.lastY = mousePos.y;
-                    trailer.x += offset.deltaX;
-                    trailer.y += offset.deltaY;
+                    trailer0.x += offset.deltaX;
+                    trailer0.y += offset.deltaY;
                 }
             }
         });
@@ -54,14 +54,16 @@ let gameArea = {
 
 function startGame() {
     gameArea.start();
-    trailer = new component(90, 30, 'blue', 20, 20, 'ABC000');
+    trailers = [];
+    trailer0 = new component(90, 30, 'blue', 'ABC000');
+    generateTrailers(10);
 };
 
-function component (width, height, color, x, y, plateNr) {
+function component(width, height, color, plateNr) {
     this.width = width;
     this.height = height;
-    this.x = x;
-    this.y = y;
+    this.x = 0;
+    this.y = 0;
     this.plateNr = plateNr;
     this.isClicked = false;
     this.update = () => {
@@ -86,7 +88,7 @@ function component (width, height, color, x, y, plateNr) {
 
 function updateGameArea() {
     gameArea.clear();
-    trailer.update();
+    trailer0.update();
 }
 
 function getMousePos(canvas, e) {
@@ -95,4 +97,21 @@ function getMousePos(canvas, e) {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top
     };
+}
+
+function generateTrailers(nrOfTrailers) {
+    let startNr = 1;
+    for (i = startNr; i <= nrOfTrailers; i++) {
+        let nrSeries = '';
+        if (i < 10) {
+            nrSeries = `00${i}`;
+        }
+        else if (i >= 10 && i < 100) {
+            nrSeries = `0${i}`;
+        }
+        else if (i >= 100) {
+            nrSeries = `${i}`;
+        }
+        trailers.push(new component(90, 30, 'blue', `ABC${nrSeries}`));
+    }
 }
