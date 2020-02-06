@@ -70,6 +70,9 @@ let gameArea = {
     },
     clear: function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop: function() {
+        clearInterval(this.interval);
     }
 };
 
@@ -81,6 +84,7 @@ function startGame() {
     trucks = [];
     generateTrucks(20);
     positionVehicles(trucks);
+    time = 30 * 1000;
 };
 
 function component(width, height, color, plateNr, type) {
@@ -115,10 +119,14 @@ function component(width, height, color, plateNr, type) {
         if (currentBottom >= gameArea.y && currentTop <= gameArea.y && currentLeft <= gameArea.x && currentRight >= gameArea.x) {
             this.isClicked = true;
         } else this.isClicked = false;
-    }
+    };
 };
 
 function updateGameArea() {
+    time -= 20;
+    if (time <= 0) {
+        gameArea.stop();
+    }
     gameArea.clear();
     trailers.forEach(trailer => {
         trailer.update();
