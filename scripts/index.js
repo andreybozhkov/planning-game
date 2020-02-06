@@ -59,8 +59,8 @@ let gameArea = {
 function startGame() {
     gameArea.start();
     trailers = [];
-    //trailer0 = new component(90, 30, 'blue', 'ABC000');
-    generateTrailers(10);
+    generateTrailers(20);
+    positionTrailers(trailers);
 };
 
 function component(width, height, color, plateNr) {
@@ -120,4 +120,28 @@ function generateTrailers(nrOfTrailers) {
         }
         trailers.push(new component(90, 30, 'blue', `ABC${nrSeries}`));
     }
+}
+
+function positionTrailers(trailersArray) {
+    let marginTop = 10;
+    let marginLeft = 10;
+    let marginRight = gameArea.canvas.width - 10;
+    let marginBottom = gameArea.canvas.height / 2;
+    let lastX = marginLeft;
+    let lastY = marginTop;
+    let spacing = 10;
+
+    trailersArray.forEach(trailer => {
+        trailer.x = lastX;
+        trailer.y = lastY;
+        trailer.update();
+
+        if (lastX + trailer.width * 2 + spacing > marginRight) {
+            lastX = marginLeft;
+            if (lastY + trailer.height * 2 + spacing > marginBottom) return;
+            else lastY += trailer.height + spacing;
+        } else {
+            lastX += trailer.width + spacing;
+        }
+    })
 }
