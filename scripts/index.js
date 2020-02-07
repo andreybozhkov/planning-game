@@ -180,13 +180,14 @@ function positionVehicles(vehiclesArray) { // TO DO: fix the max limit of vehicl
     let marginRight = gameArea.canvas.width - 10;
     let marginTop = 40;
     let marginBottom = gameArea.canvas.height / 2;
+    let spacing = 10;
     if (vehiclesArray[0].type === 'truck') {
         marginTop = gameArea.canvas.height / 2 + 10;
         marginBottom = gameArea.canvas.height;
+        spacing = 30;
     }
     let lastX = marginLeft;
     let lastY = marginTop;
-    let spacing = 10;
     let limitReached = false;
 
     vehiclesArray.forEach(vehicle => {
