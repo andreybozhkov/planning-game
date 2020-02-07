@@ -8,6 +8,7 @@ let draggedVehiclePlatenr = '';
 let trailers = [];
 let trucks = [];
 let matchedTrucksWithTrailers = [];
+let success = false;
 
 let gameArea = {
     canvas: (() => {
@@ -129,7 +130,11 @@ function component(width, height, color, plateNr, type) {
             context.font = '20px Arial';
             context.fillStyle = 'black';
             context.textAlign = 'center';
-            context.fillText(`Time remaining to match a trailer to each truck: ${timeSeconds} seconds.`, this.x, this.y);
+            if (success) {
+                context.fillText(`Good job! All trailers have been assigned to trucks!`, this.x, this.y);
+            } else {
+                context.fillText(`Time remaining to assign (drag and rop) a trailer (blue rectangles) to each truck (red squares) or vice versa: ${timeSeconds} seconds.`, this.x, this.y);
+            }
         } else {
             context.fillStyle = this.color;
             context.fillRect(this.x, this.y, this.width, this.height);
@@ -197,6 +202,8 @@ function updateGameArea() {
     time -= 20;
     if (time <= 0) {
         gameArea.stop();
+    } else if (trailers.length === 0 && trucks.length === 0) {
+        success = true;
     }
     gameArea.clear();
     timer.update();
@@ -207,6 +214,9 @@ function updateGameArea() {
         truck.update();
     });
     positionMatched(matchedTrucksWithTrailers);
+    if (success) {
+        gameArea.stop();
+    }
 }
 
 function getMousePos(canvas, e) {
