@@ -157,9 +157,13 @@ function component(width, height, color, plateNr, type) {
     };
     this.matchDrop = (mouseUpCoords, plateNr) => {
         if (plateNr !== this.plateNr && mouseUpCoords.x >= this.x && mouseUpCoords.x <= this.x + this.width && mouseUpCoords.y >= this.y && mouseUpCoords.y <= this.y + this.height) {
-            matchedTrucksWithTrailers.push(new matchedTruckWithTrailer(trucks.find(v => v.plateNr === this.plateNr), trailers.find(v => v.plateNr === plateNr)));
+            if (this.type === 'truck') {
+                addMatch(trucks.find(v => v.plateNr === this.plateNr), trailers.find(v => v.plateNr === plateNr));
+            } else if (this.type === 'trailer') {
+                addMatch(trucks.find(v => v.plateNr === plateNr), trailers.find(v => v.plateNr === this.plateNr));
+            }
         }
-    }
+    };
 };
 
 function matchedTruckWithTrailer(truck, trailer) {
@@ -305,4 +309,8 @@ function positionMatched(vehiclesArray) {
             lastX += vehicle.width + spacing;
         }
     })
+}
+
+function addMatch(truck, trailer) {
+    matchedTrucksWithTrailers.push(new matchedTruckWithTrailer(truck, trailer));
 }
