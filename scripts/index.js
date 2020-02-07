@@ -4,6 +4,7 @@ let keys = {
 let offset = {};
 let time = 30 * 1000;
 let timeSeconds = time / 1000;
+let draggedVehiclePlatenr = '';
 
 let gameArea = {
     canvas: (() => {
@@ -43,6 +44,9 @@ let gameArea = {
             if (gameArea.x && gameArea.y && keys.mouseDown) {
                 trailers.forEach(trailer => {
                     if (trailer.isClicked) {
+                        if (draggedVehiclePlatenr.length === 0) {
+                            draggedVehiclePlatenr = trailer.plateNr;
+                        }
                         offset.deltaX = mousePos.x - offset.lastX;
                         offset.lastX = mousePos.x;
                         offset.deltaY = mousePos.y - offset.lastY;
@@ -53,6 +57,9 @@ let gameArea = {
                 });
                 trucks.forEach(truck => {
                     if (truck.isClicked) {
+                        if (draggedVehiclePlatenr.length === 0) {
+                            draggedVehiclePlatenr = truck.plateNr;
+                        }
                         offset.deltaX = mousePos.x - offset.lastX;
                         offset.lastX = mousePos.x;
                         offset.deltaY = mousePos.y - offset.lastY;
@@ -64,6 +71,11 @@ let gameArea = {
             }
         });
         this.canvas.addEventListener('mouseup', (e) => {
+            let mousePos = getMousePos(this.canvas, e);
+            trucks.forEach(truck => {
+                truck.matchDrop(mousePos, draggedVehiclePlatenr);
+            });
+            draggedVehiclePlatenr = '';
             keys.mouseDown = false;
             gameArea.x = false;
             gameArea.y = false;
@@ -133,6 +145,11 @@ function component(width, height, color, plateNr, type) {
             this.isClicked = true;
         } else this.isClicked = false;
     };
+    this.matchDrop = (mouseUpCoords, plateNr) => {
+        if (plateNr !== this.plateNr && mouseUpCoords.x >= this.x && mouseUpCoords.x <= this.x + this.width && mouseUpCoords.y >= this.y && mouseUpCoords.y <= this.y + this.height) {
+            console.log(`Match between ${plateNr} and ${this.plateNr}`);
+        }
+    }
 };
 
 function updateGameArea() {
