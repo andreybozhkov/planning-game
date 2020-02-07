@@ -2,9 +2,12 @@ let keys = {
     mouseDown: false
 };
 let offset = {};
-let time = 30 * 1000;
+let time = 60 * 1000;
 let timeSeconds = time / 1000;
 let draggedVehiclePlatenr = '';
+let trailers = [];
+let trucks = [];
+let matchedTrucksWithTrailers = [];
 
 let gameArea = {
     canvas: (() => {
@@ -100,13 +103,10 @@ let gameArea = {
 function startGame() {
     gameArea.start();
     timer = new component(60, 20, 'black', '', 'timer');
-    trailers = [];
     generateTrailers(20);
     positionVehicles(trailers);
-    trucks = [];
     generateTrucks(20);
     positionVehicles(trucks);
-    matchedTrucksWithTrailers = [];
 };
 
 function component(width, height, color, plateNr, type) {
@@ -313,4 +313,6 @@ function positionMatched(vehiclesArray) {
 
 function addMatch(truck, trailer) {
     matchedTrucksWithTrailers.push(new matchedTruckWithTrailer(truck, trailer));
+    trucks.splice(trucks.findIndex(v => v.plateNr === truck.plateNr), 1);
+    trailers.splice(trailers.findIndex(v => v.plateNr === trailer.plateNr), 1);
 }
