@@ -106,6 +106,7 @@ function startGame() {
     trucks = [];
     generateTrucks(20);
     positionVehicles(trucks);
+    matchedTrucksWithTrailers = [];
 };
 
 function component(width, height, color, plateNr, type) {
@@ -116,6 +117,7 @@ function component(width, height, color, plateNr, type) {
     this.y = 0;
     this.plateNr = plateNr;
     this.isClicked = false;
+    this.color = color;
     this.update = () => {
         context = gameArea.context;
         if (this.type === 'timer') {
@@ -129,7 +131,7 @@ function component(width, height, color, plateNr, type) {
             context.textAlign = 'center';
             context.fillText(`Time remaining to match a trailer to each truck: ${timeSeconds} seconds.`, this.x, this.y);
         } else {
-            context.fillStyle = color;
+            context.fillStyle = this.color;
             context.fillRect(this.x, this.y, this.width, this.height);
             if (this.type === 'trailer') {
                 context.font = '20px Arial';
@@ -155,10 +157,37 @@ function component(width, height, color, plateNr, type) {
     };
     this.matchDrop = (mouseUpCoords, plateNr) => {
         if (plateNr !== this.plateNr && mouseUpCoords.x >= this.x && mouseUpCoords.x <= this.x + this.width && mouseUpCoords.y >= this.y && mouseUpCoords.y <= this.y + this.height) {
-            console.log(`Match between ${plateNr} and ${this.plateNr}`);
+            matchedTrucksWithTrailers.push(new matchedTruckWithTrailer(trucks.find(v => v.plateNr === this.plateNr), trailers.find(v => v.plateNr === plateNr)));
         }
     }
 };
+
+function matchedTruckWithTrailer(truck, trailer) {
+    this.x = 0;
+    this.y = 0;
+    this.truck = truck;
+    this.trailer = trailer;
+    this.width = truck.width + 2 + trailer.width;
+    this.height = trailer.height;
+    this.update = () => {
+        context = gameArea.context;
+        // fill truck
+        context.fillStyle = truck.color;
+        context.fillRect(this.x, this.y, truck.width, truck.height);
+        context.font = '15px Arial';
+        context.fillStyle = 'black';
+        context.textAlign = 'center';
+        context.fillText(truck.plateNr, this.x + truck.width / 2, this.y + truck.height / 1.4, truck.width);
+        // fill trailer
+        context.fillStyle = trailer.color;
+        context.fillRect(this.x + truck.width + 2, this.y, trailer.width, trailer.height);
+        context.font = '20px Arial';
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.fillText(trailer.plateNr, this.x + truck.width + trailer.width / 2, this.y + trailer.height / 1.3);
+    };
+}
+
 
 function updateGameArea() {
     time -= 20;
@@ -173,6 +202,7 @@ function updateGameArea() {
     trucks.forEach(truck => {
         truck.update();
     });
+    positionMatched(matchedTrucksWithTrailers);
 }
 
 function getMousePos(canvas, e) {
@@ -249,4 +279,30 @@ function generateTrucks(nrOfTrucks) {
         }
         trucks.push(new component(30, 30, 'red', `X${nrSeries}`, 'truck'));
     }
+}
+
+function positionMatched(vehiclesArray) {
+    let marginLeft = 10;
+    let marginRight = gameArea.canvas.width - 10;
+    let marginTop = gameArea.canvas.height - gameArea.canvas.height / 4;
+    let marginBottom = gameArea.canvas.height;
+    let spacing = 10;
+    let lastX = marginLeft;
+    let lastY = marginTop;
+
+    vehiclesArray.forEach(vehicle => {
+        vehicle.x = lastX;
+        vehicle.y = lastY;
+        vehicle.update();
+
+        if (lastX + vehicle.width * 2 + spacing > marginRight) {
+            lastX = marginLeft;
+            if (lastY + vehicle.height * 2 + spacing > marginBottom) {
+                limitReached = true;
+            }
+            else lastY += vehicle.height + spacing;
+        } else {
+            lastX += vehicle.width + spacing;
+        }
+    })
 }
