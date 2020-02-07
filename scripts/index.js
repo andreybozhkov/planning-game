@@ -71,10 +71,18 @@ let gameArea = {
             }
         });
         this.canvas.addEventListener('mouseup', (e) => {
-            let mousePos = getMousePos(this.canvas, e);
-            trucks.forEach(truck => {
-                truck.matchDrop(mousePos, draggedVehiclePlatenr);
-            });
+            if (draggedVehiclePlatenr.length > 0) {
+                let mousePos = getMousePos(this.canvas, e);
+                if (trailers.findIndex(vehicle => vehicle.plateNr === draggedVehiclePlatenr) >= 0) {
+                    trucks.forEach(truck => {
+                        truck.matchDrop(mousePos, draggedVehiclePlatenr);
+                    });
+                } else if (trucks.findIndex(vehicle => vehicle.plateNr === draggedVehiclePlatenr) >= 0) {
+                    trailers.forEach(trailer => {
+                        trailer.matchDrop(mousePos, draggedVehiclePlatenr);
+                    });
+                }
+            }
             draggedVehiclePlatenr = '';
             keys.mouseDown = false;
             gameArea.x = false;
